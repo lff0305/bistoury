@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.springframework.util.StringUtils;
 import qunar.tc.bistoury.application.api.AppServerService;
 import qunar.tc.bistoury.proxy.communicate.Connection;
 import qunar.tc.bistoury.proxy.communicate.SessionManager;
@@ -194,11 +195,15 @@ public class NettyServerManager {
     }
 
     private void registerUiNode() {
-        this.uiNode = doRegister(registryStore.getProxyZkPathForNewUi(), getIp() + ":" + tomcatPort + ":" + websocketPort);
+        this.uiNode = doRegister(registryStore.getProxyZkPathForNewUi(),
+            getIp() + ":" + getPublicHost() + ":" + tomcatPort + ":" + websocketPort);
     }
 
     private static String getIp() {
         return LocalHost.getLocalHost();
+    }
+    private static String getPublicHost() {
+        return LocalHost.getPublicHost();
     }
 
     public boolean offline() {

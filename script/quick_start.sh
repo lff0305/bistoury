@@ -20,15 +20,23 @@ BISTOURY_TMP_DIR="/tmp/bistoury"
 BISTOURY_PROXY_CONF_FILE="$BISTOURY_TMP_DIR/proxy.conf"
 
 LOCAL_IP=`/sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:"|tail -1`
+PUBLIC_IP=""
 
 start(){
+
+    if test -z "$PUBLIC_IP"
+    then
+        PUBLIC_IP=$LOCAL_IP
+        echo "Public IP Not set. Set to LOCAL_IP : PUBLIC_IP=$PUBLIC_IP"
+    fi
 
     cd $H2_DATABASE_DIR
     ./h2.sh -j $2 -i $LOCAL_IP -l $APP_LOG_DIR start
     sleep 5
 
     cd $BISTOURY_PROXY_BIN_DIR
-    ./bistoury-proxy.sh -j $2 -i $LOCAL_IP start
+        echo "Public ip = $PUBLIC_IP"
+    ./bistoury-proxy.sh -j $2 -i $LOCAL_IP -L $PUBLIC_IP start
     #等待proxy启动
     sleep 5
 
@@ -64,15 +72,17 @@ stop(){
 
 for CMD in "$@";do true; done
 
-while getopts p:i:j:l:c:h opt;do
+while getopts p:i:j:l:c:h:L: opt;do
     case $opt in
         p) APP_PID=$OPTARG;;
         i) LOCAL_IP=$OPTARG;;
         j) JAVA_HOME=$OPTARG;;
         l) APP_LOG_DIR=$OPTARG;;
         c) BISTOURY_AGENT_APP_LIB_CLASS=$OPTARG;;
+                L) PUBLIC_IP=$OPTARG;;
         h|*) echo "-p    通过-p指定应用进程pid"
            echo "-i    通过-i指定本机ip"
+           echo "-L    通过-L指定外部ip. 如果没有设置，使用本机ip"
            echo "-j    通过-j指定java home"
            echo "-l    通过-l参数指定应用日志目录，不指定时使用/tmp目录"
            echo "-c    通过-c指定应用依赖的jar包中的一个类（推荐使用公司内部中间件的jar包或Spring相关包中的类，如org.springframework.web.servlet.DispatcherServlet）"
@@ -98,8 +108,8 @@ if [[ "start" == $CMD ]] && [[ -n "$APP_PID" &&  -n "$JAVA_HOME" ]]; then
     PROXY_TOMCAT_PORT=9090
     PROXY_WEBSOCKET_PORT=9881;
 
-    echo "$LOCAL_IP:$PROXY_TOMCAT_PORT:$PROXY_WEBSOCKET_PORT">$BISTOURY_PROXY_CONF_FILE
-    start $APP_PID $JAVA_HOME $BISTOURY_AGENT_APP_LIB_CLASS $LOCAL_IP
+    echo "$LOCAL_IP:$PUBLIC_IP:$PROXY_TOMCAT_PORT:$PROXY_WEBSOCKET_PORT">$BISTOURY_PROXY_CONF_FILE
+    start $APP_PID $JAVA_HOME $BISTOURY_AGENT_APP_LIB_CLASS $LOCAL_IP $PUBLIC_IP
 elif [[ "stop" == $CMD ]]; then
     stop
     rm -rf $BISTOURY_PROXY_CONF_FILE

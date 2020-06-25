@@ -84,7 +84,9 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     public List<String> getWebSocketUrl(final String agentIp) {
         List<String> result = Lists.newArrayList();
-        doGetWebSocketUrl(result, getAllProxyUrls(), agentIp);
+        List<String> urls = getAllProxyUrls();
+        logger.info("Urls = {}", urls);
+        doGetWebSocketUrl(result, urls, agentIp);
         return result;
     }
 
@@ -118,7 +120,7 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private String buildWebsocketUrl(ProxyInfo proxyInfo) {
-        return SCHEMA + proxyInfo.getIp() + COLON + proxyInfo.getWebsocketPort() + PATH;
+        return SCHEMA + proxyInfo.getPublicHost() + COLON + proxyInfo.getWebsocketPort() + PATH;
     }
 
     private String buildProxyAgentUrl(ProxyInfo proxyInfo) {

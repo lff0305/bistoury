@@ -34,22 +34,24 @@ public class ProxyInfoParser {
 
     public static Optional<ProxyInfo> parseProxyInfo(String line) {
         List<String> list = PROXY_SPLITTER.splitToList(line);
-        if (CollectionUtils.isEmpty(list) || list.size() != 3) {
+        if (CollectionUtils.isEmpty(list) || list.size() != 4) {
             return Optional.empty();
         }
         final String ip = list.get(0);
-        final int tomcatPort = Integer.valueOf(list.get(1));
-        final int websocketPort = Integer.valueOf(list.get(2));
-        return Optional.of(new ProxyInfo(ip, tomcatPort, websocketPort));
+        final String publicHost = list.get(1);
+        final int tomcatPort = Integer.valueOf(list.get(2));
+        final int websocketPort = Integer.valueOf(list.get(3));
+        return Optional.of(new ProxyInfo(ip, publicHost, tomcatPort, websocketPort));
     }
 
     public static Optional<ProxyInfo> parseProxyInfoWithoutTomcatPort(String infoWithoutWebsocketPort) {
         List<String> list = PROXY_SPLITTER.splitToList(infoWithoutWebsocketPort);
-        if (CollectionUtils.isEmpty(list) || list.size() != 2) {
+        if (CollectionUtils.isEmpty(list) || list.size() != 3) {
             return Optional.empty();
         }
         final String ip = list.get(0);
-        final int tomcatPort = Integer.valueOf(list.get(1));
-        return Optional.of(new ProxyInfo(ip, tomcatPort, 0));
+        final String publicHost = list.get(1);
+        final int tomcatPort = Integer.valueOf(list.get(2));
+        return Optional.of(new ProxyInfo(ip, publicHost, tomcatPort, 0));
     }
 }

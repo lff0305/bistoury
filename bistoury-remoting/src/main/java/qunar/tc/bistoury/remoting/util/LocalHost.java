@@ -218,4 +218,14 @@ public class LocalHost {
         }
     }
 
+    public static String getPublicHost() {
+        String publicHost = System.getProperty("bistoury.public.host");
+        logger.info("publicHost = {}", publicHost);
+        if (Strings.isNullOrEmpty(publicHost)) {
+            return getLocalHost();
+        } else {
+            return publicHost;
+        }
+    }
+
 }

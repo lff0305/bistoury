@@ -44,6 +44,7 @@ public class ProxyConfigForAgentGetController {
 
         proxyConfig = new ProxyConfig(
                 LocalHost.getLocalHost(),
+                LocalHost.getPublicHost(),
                 dynamicConfig.getInt("agent.newport", -1),
                 dynamicConfig.getInt("heartbeatSec", 30));
     }
@@ -57,15 +58,19 @@ public class ProxyConfigForAgentGetController {
     private static class ProxyConfig {
 
         private final String ip;
-
+        private final String publicHost;
         private final int port;
 
         private final int heartbeatSec;
 
         private ProxyConfig(String ip, int port, int heartbeatSec) {
+            this(ip, ip, port, heartbeatSec);
+        }
+        private ProxyConfig(String ip, String publicHost, int port, int heartbeatSec) {
             this.ip = ip;
             this.port = port;
             this.heartbeatSec = heartbeatSec;
+            this.publicHost = publicHost;
         }
 
         public String getIp() {
@@ -80,10 +85,14 @@ public class ProxyConfigForAgentGetController {
             return heartbeatSec;
         }
 
+        public String getPublicHost() {
+            return publicHost;
+        }
         @Override
         public String toString() {
             return "ProxyConfig{" +
                     "ip='" + ip + '\'' +
+                    ", publicHost=" + publicHost +
                     ", port=" + port +
                     ", heartbeatSec=" + heartbeatSec +
                     '}';

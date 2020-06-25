@@ -11,12 +11,15 @@ BISTOURY_MAIN="qunar.tc.bistoury.proxy.container.Bootstrap"
 for CMD in "$@";do true; done
 
 LOCAL_IP=""
-while getopts j:i:h opt;do
+PUBLIC_IP=""
+while getopts j:i:h:L: opt;do
     case $opt in
         j) JAVA_HOME=$OPTARG;;
         i) LOCAL_IP=$OPTARG;;
+        L) PUBLIC_IP=$OPTARG;;
         h|*) echo "-j    通过-j指定java home"
            echo "-i    通过-i参数指定本机ip"
+           echo "-L    通过-L指定外部ip. 如果没有设置，使用本机ip"
            echo "-h    通过-h查看命令帮助"
            exit 0
     esac
@@ -30,6 +33,10 @@ fi
 
 if [[ -n $LOCAL_IP ]]; then
     JAVA_OPTS="$JAVA_OPTS -Dbistoury.local.host=$LOCAL_IP"
+fi
+
+if [[ -n $PUBLIC_IP ]]; then
+    JAVA_OPTS="$JAVA_OPTS -Dbistoury.public.host=$PUBLIC_IP"
 fi
 
 CLASSPATH="$CLASSPATH:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/sa-jdi.jar"

@@ -24,17 +24,22 @@ package qunar.tc.bistoury.ui.util;
  */
 public class ProxyInfo {
     private String ip;
+    private String publicHost;
     private int tomcatPort;
     private int websocketPort;
 
-    public ProxyInfo(String ip, int tomcatPort, int websocketPort) {
+    public ProxyInfo(String ip, String publicHost, int tomcatPort, int websocketPort) {
         this.ip = ip;
+        this.publicHost = publicHost;
         this.tomcatPort = tomcatPort;
         this.websocketPort = websocketPort;
     }
 
     public String getIp() {
         return ip;
+    }
+    public String getPublicHost() {
+        return this.publicHost;
     }
 
     public void setIp(String ip) {
