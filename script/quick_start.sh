@@ -23,13 +23,6 @@ LOCAL_IP=`/sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{prin
 PUBLIC_IP=""
 
 start(){
-
-    if test -z "$PUBLIC_IP"
-    then
-        PUBLIC_IP=$LOCAL_IP
-        echo "Public IP Not set. Set to LOCAL_IP : PUBLIC_IP=$PUBLIC_IP"
-    fi
-
     cd $H2_DATABASE_DIR
     ./h2.sh -j $2 -i $LOCAL_IP -l $APP_LOG_DIR start
     sleep 5
@@ -107,7 +100,11 @@ fi
 if [[ "start" == $CMD ]] && [[ -n "$APP_PID" &&  -n "$JAVA_HOME" ]]; then
     PROXY_TOMCAT_PORT=9090
     PROXY_WEBSOCKET_PORT=9881;
-
+    if test -z "$PUBLIC_IP"
+    then
+        PUBLIC_IP=$LOCAL_IP
+        echo "Public IP Not set. Set to LOCAL_IP : PUBLIC_IP=$PUBLIC_IP"
+    fi
     echo "$LOCAL_IP:$PUBLIC_IP:$PROXY_TOMCAT_PORT:$PROXY_WEBSOCKET_PORT">$BISTOURY_PROXY_CONF_FILE
     start $APP_PID $JAVA_HOME $BISTOURY_AGENT_APP_LIB_CLASS $LOCAL_IP $PUBLIC_IP
 elif [[ "stop" == $CMD ]]; then
